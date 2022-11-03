@@ -4,8 +4,8 @@ function fetchGetproducts() {
 
     fetch('http://localhost:3000/api/products').then(response => response.json()).then(data => {
 
-        
-const items = document.querySelector('.items')
+        let items = document.querySelector('.items')
+
 
         for (let i = 0; i < data.length; i++) {
 
