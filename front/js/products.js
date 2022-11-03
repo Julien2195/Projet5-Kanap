@@ -1,53 +1,70 @@
-
 //Recherche de l'URL via window.location
 const queryString = window.location.search;
 
-//On coupe le ? avec la methode slice pour recuperer seulement l'id 
-let myID = queryString.slice(1)
+//On coupe le ? avec la methode slice pour recuperer seulement l'id
+let myID = queryString.slice(1);
 
+////////////////////////////////////////////////////////////
 
-fetch(`http://localhost:3000/api/products/${myID}`).then(response => response.json()).then(data => {
+const item = document.querySelector(".item__img");
+const titleH1 = document.querySelector("#title");
+const price = document.querySelector("#price");
+const description = document.querySelector("#description");
+const colorsSelect = document.querySelector("#colors");
+const card = document.querySelector("#addToCart");
+const nbrOfQuantity = document.querySelector('#quantity')
 
+////////////////////////////////////////////////////////////
 
-// RECUPERE L'IMG, LE PRIX, LE TITRE, LA DESCRIPTION
+fetch(`http://localhost:3000/api/products/${myID}`)
+  .then((response) => response.json())
+  .then((data) => {
+    // RECUPERE L'IMG, LE PRIX, LE TITRE, LA DESCRIPTION
     function getProductById() {
+      const img = document.createElement("img");
 
-        const img = document.createElement('img')
+      titleH1.textContent = data.name;
+      price.textContent = data.price;
+      description.textContent = data.description;
 
-        const item = document.querySelector('.item__img')
-        const titleH1 = document.querySelector('#title')
-        const price = document.querySelector('#price')
-
-        const description = document.querySelector('#description')
-
-        titleH1.innerText = data.name
-        price.innerText = data.price
-        description.innerText = data.description
-
-        img.src = data.imageUrl
-        img.alt = data.altTxt
-        item.append(img)
-
+      img.src = data.imageUrl;
+      img.alt = data.altTxt;
+      item.append(img);
     }
-    getProductById()
+    getProductById();
 
+    //FONCTION CHOIX DES COULEURS
 
-
-    //FONCTION CHOIX DES COULEURS 
     function getColors() {
+      for (let color of data.colors) {
+        const option = document.createElement("option");
 
-        for (let i = 0; i < data.colors.length; i++) {
-            const colors = document.querySelector('#colors')
-            const option = document.createElement('option')
-            option.innerHTML = `<option value="${data.colors[i]}">${data.colors[i]}</option>`
-
-            colors.append(option)
-        }
+        option.setAttribute("value", color);
+        option.textContent = color;
+        colorsSelect.appendChild(option);
+      }
     }
-    getColors()
+    getColors();
+  });
+
+
+
+
+card.addEventListener("click", () => {
+
+   let user ={
+    monID: myID,
+    colors: colorsSelect.value,
+    quantity: nbrOfQuantity.value
+}
+  localStorage.setItem("nom",JSON.stringify(user));
+
+
+
 
 })
 
-
-
-fetch(`http://localhost:3000/api/products/`).then(response => response.json()).then(data => (console.log(data)))
+//A SUPPRIMER
+fetch(`http://localhost:3000/api/products/`)
+  .then((response) => response.json())
+  .then((data) => console.log(data));
