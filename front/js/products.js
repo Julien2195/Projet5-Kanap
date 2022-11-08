@@ -12,7 +12,7 @@ const price = document.querySelector("#price");
 const description = document.querySelector("#description");
 const colorsSelect = document.querySelector("#colors");
 const card = document.querySelector("#addToCart");
-const nbrOfQuantity = document.querySelector('#quantity')
+const nbrOfQuantity = document.querySelector("#quantity");
 
 ////////////////////////////////////////////////////////////
 
@@ -46,25 +46,49 @@ fetch(`http://localhost:3000/api/products/${myID}`)
     }
     getColors();
   });
-
-
-
-
+  let ancienPanier = JSON.parse(localStorage.getItem("panier"));
 card.addEventListener("click", () => {
+  // Condition pour ajouter les elements dans le LS
+  if (
+    nbrOfQuantity.value <= 0 ||
+    nbrOfQuantity.value > 100 ||
+    colorsSelect.value === ""
+  ) {
+    return;
+  }
+  let items = {
+    id: myID,
+    color: colorsSelect.value,
+    quantity: nbrOfQuantity.value,
+  };
 
-   let user ={
-    monID: myID,
-    colors: colorsSelect.value,
-    quantity: nbrOfQuantity.value
-}
-  localStorage.setItem("nom",JSON.stringify(user));
+  addPanier(items);
 
+  function savePanier(panier) {
+    localStorage.setItem("panier", JSON.stringify(panier));
+  }
 
+  function getPanier() {
+    let panier = localStorage.getItem("panier");
+    if (panier === null) {
+      panier = [];
+    } else {
+      return JSON.parse(panier);
+    }
+    return panier;
+  }
 
+  function addPanier(items) {
+    let panier = getPanier();
+    let foundProduct = panier.find(
+      (p) => p.id === items.id && p.color === items.color
+    );
 
-})
-
-//A SUPPRIMER
-fetch(`http://localhost:3000/api/products/`)
-  .then((response) => response.json())
-  .then((data) => console.log(data));
+    if (foundProduct != undefined) {
+      foundProduct.quantity += parseInt(items.quantity);
+    } else {
+      panier.push(items);
+    }
+    savePanier(panier);
+  }
+});
