@@ -46,7 +46,7 @@ fetch(`http://localhost:3000/api/products/${myID}`)
     }
     getColors();
   });
-  let ancienPanier = JSON.parse(localStorage.getItem("panier"));
+  // let ancienPanier = JSON.parse(localStorage.getItem("panier"));
 card.addEventListener("click", () => {
   // Condition pour ajouter les elements dans le LS
   if (
@@ -59,7 +59,7 @@ card.addEventListener("click", () => {
   let items = {
     id: myID,
     color: colorsSelect.value,
-    quantity: nbrOfQuantity.value,
+    quantity: parseInt(nbrOfQuantity.value),
   };
 
   addPanier(items);
@@ -85,7 +85,8 @@ card.addEventListener("click", () => {
     );
 
     if (foundProduct != undefined) {
-      foundProduct.quantity += parseInt(items.quantity);
+      foundProduct.quantity +=items.quantity;
+      console.log(typeof items.quantity);
     } else {
       panier.push(items);
     }
