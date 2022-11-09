@@ -67,7 +67,7 @@ fetch(`http://localhost:3000/api/products`)
 
         pDeleteItem.addEventListener("click", () => {
           panier = panier.filter(
-            (p) => p.id != panier[i].id &&  panier[i].color
+            (p) => p.id != panier[i].id ||  p.color != panier[i].color
           );
           savePanier(panier);
           window.location.reload();
