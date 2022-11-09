@@ -20,33 +20,16 @@ fetch(`http://localhost:3000/api/products/${myID}`)
   .then((response) => response.json())
   .then((data) => {
     // RECUPERE L'IMG, LE PRIX, LE TITRE, LA DESCRIPTION
-    function getProductById() {
-      const img = document.createElement("img");
 
-      titleH1.textContent = data.name;
-      price.textContent = data.price;
-      description.textContent = data.description;
-
-      img.src = data.imageUrl;
-      img.alt = data.altTxt;
-      item.append(img);
-    }
-    getProductById();
+    getProductById(data);
 
     //FONCTION CHOIX DES COULEURS
 
-    function getColors() {
-      for (let color of data.colors) {
-        const option = document.createElement("option");
-
-        option.setAttribute("value", color);
-        option.textContent = color;
-        colorsSelect.appendChild(option);
-      }
-    }
-    getColors();
+    getColors(data);
   });
-  // let ancienPanier = JSON.parse(localStorage.getItem("panier"));
+
+
+
 card.addEventListener("click", () => {
   // Condition pour ajouter les elements dans le LS
   if (
@@ -60,36 +43,8 @@ card.addEventListener("click", () => {
     id: myID,
     color: colorsSelect.value,
     quantity: parseInt(nbrOfQuantity.value),
+    
   };
 
   addPanier(items);
-
-  function savePanier(panier) {
-    localStorage.setItem("panier", JSON.stringify(panier));
-  }
-
-  function getPanier() {
-    let panier = localStorage.getItem("panier");
-    if (panier === null) {
-      panier = [];
-    } else {
-      return JSON.parse(panier);
-    }
-    return panier;
-  }
-
-  function addPanier(items) {
-    let panier = getPanier();
-    let foundProduct = panier.find(
-      (p) => p.id === items.id && p.color === items.color
-    );
-
-    if (foundProduct != undefined) {
-      foundProduct.quantity +=items.quantity;
-      console.log(typeof items.quantity);
-    } else {
-      panier.push(items);
-    }
-    savePanier(panier);
-  }
 });
