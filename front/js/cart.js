@@ -2,12 +2,25 @@ fetch(`http://localhost:3000/api/products`)
   .then((response) => response.json())
   .then((data) => {
     let panier = getPanier();
+    console.log(panier.length);
 
+        const idItems = document.querySelector("#cart__items");
+        const idPrice = document.querySelector(".cart__price");
+
+
+    // MESSAGE SI PANIER VIDE
+    if (panier.length === 0) {
+    
+idPrice.textContent= 'Panier Vide'
+idPrice.style.textAlign ='center'
+idPrice.style.fontWeight ='600'
+idPrice.style.fontSize ='20px'
+idPrice.style.color ='red'
+
+    }
     for (let i = 0; i < panier.length; i++) {
       let foundID = data.find((p) => p._id === panier[i].id);
       if (foundID != undefined) {
-        //QUERYSELECTOR
-        const idClass = document.querySelector("#cart__items");
 
         //ARTICLE
         const article = document.createElement("article");
@@ -79,17 +92,14 @@ fetch(`http://localhost:3000/api/products`)
           input.addEventListener("change", () => {
             const updateQuantity = parseInt(input.value);
 
-            
-              let foundPanier = panier.find(
-                (p) => p.id === panier.id && p.color === panier.color
-              );
+            let foundPanier = panier.find(
+              (p) => p.id === panier.id && p.color === panier.color
+            );
 
-              if (foundPanier != input.value) {
-                panier[i].quantity = updateQuantity;
-                console.log(updateQuantity);
-                savePanier(panier);
-              }
-            
+            if (foundPanier != input.value) {
+              panier[i].quantity = updateQuantity;
+              savePanier(panier);
+            }
           });
           //CINDITION SI PANIER EST INFERIEUR A 0 OU SUPPERIEUR A 100
           if (panier[i].quantity >= 100) {
@@ -115,11 +125,13 @@ fetch(`http://localhost:3000/api/products`)
             );
 
             savePanier(panier);
+            window.location.reload();
           });
         }
         deletePanier();
-        /////////////////////
-        idClass.append(article);
+
+        // AJOUT DU HTML
+        idItems.append(article);
         /////////////////////
         article.append(div1);
         div1.append(img);
@@ -140,11 +152,7 @@ fetch(`http://localhost:3000/api/products`)
         ////////////////////
         div4.append(div6);
         div6.append(pDeleteItem);
+
       }
     }
   });
-
-// A SUPPRIMER
-// fetch("http://localhost:3000/api/products")
-//   .then((response) => response.json())
-//   .then((data) => console.log(data));
