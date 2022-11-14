@@ -4,8 +4,6 @@ fetch(`http://localhost:3000/api/products`)
     let panier = getPanier();
 
     for (let i = 0; i < panier.length; i++) {
-
-      
       let foundID = data.find((p) => p._id === panier[i].id);
       if (foundID != undefined) {
         //QUERYSELECTOR
@@ -29,7 +27,10 @@ fetch(`http://localhost:3000/api/products`)
           document.createElement(
             "div"
           ); /*<div class="cart__item__content__settings">*/
-        const div5 =document.createElement("div" ); /*<div class="cart__item__content__settings__quantity">*/
+        const div5 =
+          document.createElement(
+            "div"
+          ); /*<div class="cart__item__content__settings__quantity">*/
         const div6 =
           document.createElement(
             "div"
@@ -58,15 +59,13 @@ fetch(`http://localhost:3000/api/products`)
         div5.classList.add("cart__item__content__settings__quantity");
         pQuantity.textContent = "Qté :";
         //CREATION DU INPUT
-                const itemQuantity = document.querySelector(".itemQuantity");
-
         const input = document.createElement("input");
         input.setAttribute("type", "number");
         input.setAttribute("class", "itemQuantity");
-        input.setAttribute("name", "itemQuantity")
-        input.setAttribute("min", "1")
-        input.setAttribute("max", "100")
-        input.setAttribute("value", panier[i].quantity)
+        input.setAttribute("name", "itemQuantity");
+        input.setAttribute("min", "1");
+        input.setAttribute("max", "100");
+        input.setAttribute("value", panier[i].quantity);
 
         // div5.innerHTML = `<input type="number" class="itemQuantity"  name="itemQuantity" min="1" max="100" value=${panier[i].quantity}>`;
         //CART ITEM SETTINGS DELETE
@@ -75,25 +74,50 @@ fetch(`http://localhost:3000/api/products`)
         pDeleteItem.textContent = "Supprimer";
 
         //MODIFIER QUANTITE  ET SAUVEGARDER DANS LE LS
-        console.log(input);
-        function updateQuantity() {
-          
-          itemQuantity.addEventListener("change", () => {
-            panier[i].quantity = itemQuantity
+
+        function UpdateQuantity() {
+          input.addEventListener("change", () => {
+            const updateQuantity = parseInt(input.value);
+
+            
+              let foundPanier = panier.find(
+                (p) => p.id === panier.id && p.color === panier.color
+              );
+
+              if (foundPanier != input.value) {
+                panier[i].quantity = updateQuantity;
+                console.log(updateQuantity);
+                savePanier(panier);
+              }
+            
+          });
+          //CINDITION SI PANIER EST INFERIEUR A 0 OU SUPPERIEUR A 100
+          if (panier[i].quantity >= 100) {
+            panier[i].quantity = 100;
             savePanier(panier);
-            console.log(panier);
+          }
+          if (panier[i].quantity <= 0) {
+            panier = panier.filter(
+              (p) => p.id != panier[i].id || p.color != panier[i].color
+            );
+            savePanier(panier);
+            window.location.reload();
+          }
+        }
+
+        UpdateQuantity();
+
+        // SUUPRIMER ELEMENTS PANIER
+        function deletePanier() {
+          pDeleteItem.addEventListener("click", () => {
+            panier = panier.filter(
+              (p) => p.id != panier[i].id || p.color != panier[i].color
+            );
+
+            savePanier(panier);
           });
         }
-// updateQuantity()
-        // SUUPRIMER ELEMENTS PANIER
-
-        pDeleteItem.addEventListener("click", () => {
-          panier = panier.filter(
-            (p) => p.id != panier[i].id || p.color != panier[i].color
-          );
-          savePanier(panier);
-          window.location.reload();
-        });
+        deletePanier();
         /////////////////////
         idClass.append(article);
         /////////////////////
