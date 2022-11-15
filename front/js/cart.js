@@ -2,26 +2,24 @@ fetch(`http://localhost:3000/api/products`)
   .then((response) => response.json())
   .then((data) => {
     let panier = getPanier();
-    console.log(panier.length);
 
-        const idItems = document.querySelector("#cart__items");
-        const idPrice = document.querySelector(".cart__price");
+    const idItems = document.querySelector("#cart__items");
+    const idPrice = document.querySelector(".cart__price");
+    const totalQuantity = document.querySelector("#totalQuantity");
 
+    
 
     // MESSAGE SI PANIER VIDE
     if (panier.length === 0) {
-    
-idPrice.textContent= 'Panier Vide'
-idPrice.style.textAlign ='center'
-idPrice.style.fontWeight ='600'
-idPrice.style.fontSize ='20px'
-idPrice.style.color ='red'
-
+      idPrice.textContent = "Panier Vide";
+      idPrice.style.textAlign = "center";
+      idPrice.style.fontWeight = "600";
+      idPrice.style.fontSize = "20px";
+      idPrice.style.color = "red";
     }
     for (let i = 0; i < panier.length; i++) {
       let foundID = data.find((p) => p._id === panier[i].id);
       if (foundID != undefined) {
-
         //ARTICLE
         const article = document.createElement("article");
         const classCart_item = article.classList.add("cart__item");
@@ -100,24 +98,26 @@ idPrice.style.color ='red'
               panier[i].quantity = updateQuantity;
               savePanier(panier);
             }
+
+            //CONDITION SI PANIER EST INFERIEUR A 0 OU SUPPERIEUR A 100
+            if (panier[i].quantity > 100) {
+              alert("Vous ne pouvez pas prendre plus de 100 articles !");
+              panier[i].quantity = 100;
+              savePanier(panier);
+            }
+            if (panier[i].quantity <= 0) {
+              panier = panier.filter(
+                (p) => p.id != panier[i].id || p.color != panier[i].color
+              );
+              savePanier(panier);
+              window.location.reload();
+            }
           });
-          //CINDITION SI PANIER EST INFERIEUR A 0 OU SUPPERIEUR A 100
-          if (panier[i].quantity >= 100) {
-            panier[i].quantity = 100;
-            savePanier(panier);
-          }
-          if (panier[i].quantity <= 0) {
-            panier = panier.filter(
-              (p) => p.id != panier[i].id || p.color != panier[i].color
-            );
-            savePanier(panier);
-            window.location.reload();
-          }
         }
 
         UpdateQuantity();
 
-        // SUUPRIMER ELEMENTS PANIER
+        // SUPRIMER ELEMENTS PANIER
         function deletePanier() {
           pDeleteItem.addEventListener("click", () => {
             panier = panier.filter(
@@ -129,7 +129,14 @@ idPrice.style.color ='red'
           });
         }
         deletePanier();
-
+        
+// TOTAL DE QUANTITES
+if (panier.length >1){
+  idPrice.innerHTML= `<p>Total (<span id="totalQuantity">${panier.length}</span> articles) : <span id="totalPrice"><!-- 84,00 --></span> €</p`;
+  
+}else{
+idPrice.innerHTML= `<p>Total (<span id="totalQuantity">${panier.length}</span> article) : <span id="totalPrice"><!-- 84,00 --></span> €</p`
+}
         // AJOUT DU HTML
         idItems.append(article);
         /////////////////////
@@ -152,7 +159,6 @@ idPrice.style.color ='red'
         ////////////////////
         div4.append(div6);
         div6.append(pDeleteItem);
-
       }
     }
   });
