@@ -1,3 +1,7 @@
+
+
+
+
 fetch(`http://localhost:3000/api/products`)
   .then((response) => response.json())
   .then((data) => {
@@ -272,8 +276,9 @@ fetch(`http://localhost:3000/api/products`)
         itemQuestion[4].appendChild(succes);
       }
     }
+    
     form.addEventListener("submit", (e) => {
-      e.preventDefault();
+      e.preventDefault(e)
       fetch(`http://localhost:3000/api/products/order`, {
         method: "POST",
         headers: {
@@ -289,6 +294,10 @@ fetch(`http://localhost:3000/api/products`)
           },
           products: panier.map((p) => p.id),
         }),
-      });
+      }).then((response) => response.json()).then((data) => {
+      ( response => response.orderId).then( window.location.href="./confirmation.html?"+data.orderId)
+
+      
+      })
     });
   });
