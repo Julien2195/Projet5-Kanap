@@ -2,7 +2,6 @@ fetch(`http://localhost:3000/api/products`)
   .then((response) => response.json())
   .then((data) => {
     let panier = getPanier();
-
     const idItems = document.querySelector("#cart__items");
     const idPrice = document.querySelector(".cart__price");
 
@@ -15,20 +14,16 @@ fetch(`http://localhost:3000/api/products`)
       idPrice.style.color = "red";
     }
 
-    
     // PRIX TOTAL
     let totalPrice = 0;
 
     for (let i = 0; i < panier.length; i++) {
-    
-    
-
       const foundID = data.find((p) => p._id === panier[i].id);
 
       if (foundID != undefined) {
         //ARTICLE
-        //ADDITION DES PRIX 
-        totalPrice += foundID.price * panier[i].quantity
+        //ADDITION DES PRIX
+        totalPrice += foundID.price * panier[i].quantity;
         const article = document.createElement("article");
         const classCart_item = article.classList.add("cart__item");
         article.setAttribute("data-id", "product-ID");
@@ -166,10 +161,8 @@ fetch(`http://localhost:3000/api/products`)
         div4.append(div6);
         div6.append(pDeleteItem);
       }
-      
     }
 
-    
     //************************************************************************************************************************** */
 
     //FORMULAIRE
@@ -279,21 +272,23 @@ fetch(`http://localhost:3000/api/products`)
         itemQuestion[4].appendChild(succes);
       }
     }
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      fetch(`http://localhost:3000/api/products/order`, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          contact: {
+            firstName: firstName.value,
+            lastName: lastName.value,
+            address: address.value,
+            city: city.value,
+            email: email.value,
+          },
+          products: panier.map((p) => p.id),
+        }),
+      });
+    });
   });
-
-  // fetch(`http://localhost:3000/api/products/order`,{
-  // method: "POST",
-  // headers:{
-  //   'content-type': "application/json"
-  //  },
-  //  body: JSON.stringify({
-  //   contact:{
-      
-  //   },
-
-  //  })
-  // })
-  // .then((response) => response.json())
-  // .then((data) => {console.log(data)});
-
-  
