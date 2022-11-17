@@ -37,14 +37,16 @@ card.addEventListener("click", () => {
     nbrOfQuantity.value > 100 ||
     colorsSelect.value === ""
   ) {
-    return;
+    alert("Vous devez choisir une quantité et une couleur ")
+    return
   }
+  
   let items = {
     id: myID,
     color: colorsSelect.value,
     quantity: parseInt(nbrOfQuantity.value),
     
   };
-
+  alert("Votre produit à été ajouté au panier")
   addPanier(items);
 });

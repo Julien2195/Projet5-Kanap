@@ -5,9 +5,6 @@ fetch(`http://localhost:3000/api/products`)
 
     const idItems = document.querySelector("#cart__items");
     const idPrice = document.querySelector(".cart__price");
-    const totalQuantity = document.querySelector("#totalQuantity");
-
-    
 
     // MESSAGE SI PANIER VIDE
     if (panier.length === 0) {
@@ -17,8 +14,18 @@ fetch(`http://localhost:3000/api/products`)
       idPrice.style.fontSize = "20px";
       idPrice.style.color = "red";
     }
+
+    let totalPrice = 0;
+    const tab = [];
+    tab.push(data.price);
+    console.log(tab);
+
+    const sumWithInitial = tab.reduce((a, b) => a + b, 0);
+    console.log(sumWithInitial);
+
     for (let i = 0; i < panier.length; i++) {
-      let foundID = data.find((p) => p._id === panier[i].id);
+      const foundID = data.find((p) => p._id === panier[i].id);
+
       if (foundID != undefined) {
         //ARTICLE
         const article = document.createElement("article");
@@ -63,7 +70,7 @@ fetch(`http://localhost:3000/api/products`)
         div3.classList.add("cart__item__content__description");
         h2.textContent = data[i].description;
         pColor.textContent = panier[i].color;
-        pPrice.textContent = `${data[i].price} €`;
+        pPrice.textContent = `${foundID.price} €`;
         //CART ITEM SETTINGS
         div4.classList.add("cart__item__content__settings");
         //CART ITEM SETTINGS QUANTITY
@@ -78,7 +85,6 @@ fetch(`http://localhost:3000/api/products`)
         input.setAttribute("max", "100");
         input.setAttribute("value", panier[i].quantity);
 
-        // div5.innerHTML = `<input type="number" class="itemQuantity"  name="itemQuantity" min="1" max="100" value=${panier[i].quantity}>`;
         //CART ITEM SETTINGS DELETE
         div6.classList.add("cart__item__content__settings__delete");
         pDeleteItem.classList.add("deleteItem");
@@ -89,7 +95,6 @@ fetch(`http://localhost:3000/api/products`)
         function UpdateQuantity() {
           input.addEventListener("change", () => {
             const updateQuantity = parseInt(input.value);
-
             let foundPanier = panier.find(
               (p) => p.id === panier.id && p.color === panier.color
             );
@@ -123,20 +128,20 @@ fetch(`http://localhost:3000/api/products`)
             panier = panier.filter(
               (p) => p.id != panier[i].id || p.color != panier[i].color
             );
-
+            alert("Article supprimé");
             savePanier(panier);
             window.location.reload();
           });
         }
         deletePanier();
-        
-// TOTAL DE QUANTITES
-if (panier.length >1){
-  idPrice.innerHTML= `<p>Total (<span id="totalQuantity">${panier.length}</span> articles) : <span id="totalPrice"><!-- 84,00 --></span> €</p`;
-  
-}else{
-idPrice.innerHTML= `<p>Total (<span id="totalQuantity">${panier.length}</span> article) : <span id="totalPrice"><!-- 84,00 --></span> €</p`
-}
+
+        // TOTAL DE QUANTITES
+        if (panier.length > 1) {
+          idPrice.innerHTML = `<p>Total (<span id="totalQuantity">${panier.length}</span> articles) : <span id="totalPrice"><!-- 84,00 --></span> €</p`;
+        } else {
+          idPrice.innerHTML = `<p>Total (<span id="totalQuantity">${panier.length}</span> article) : <span id="totalPrice"><!-- 84,00 --></span> €</p`;
+        }
+
         // AJOUT DU HTML
         idItems.append(article);
         /////////////////////
@@ -161,4 +166,119 @@ idPrice.innerHTML= `<p>Total (<span id="totalQuantity">${panier.length}</span> a
         div6.append(pDeleteItem);
       }
     }
+    //************************************************************************************************************************** */
+
+    //FORMULAIRE
+    const form = document.querySelector(".cart__order__form");
+    const firstNameErrorMsg = document.querySelector("#firstNameErrorMsg");
+    const lastNameErrorMsg = document.querySelector("#lastNameErrorMsg");
+    const addressErrorMsg = document.querySelector("#addressErrorMsg");
+    const cityErrorMsg = document.querySelector("#cityErrorMsg");
+    const emailErrorMsg = document.querySelector("#emailErrorMsg");
+    const itemQuestion = document.querySelectorAll(
+      ".cart__order__form__question"
+    );
+    //MESSAGE SUCCES
+    const succes = document.createElement("p");
+    succes.style.color = "green";
+
+    //PRENOM
+    form.firstName.addEventListener("change", function () {
+      validationfirstName(form.firstName);
+    });
+    function validationfirstName(Name) {
+      const nameRegex = new RegExp(/^[a-zA-Z\-]+$/);
+      const testName = nameRegex.test(Name.value);
+      if (testName === false) {
+        firstNameErrorMsg.textContent = "Prenom non valide !";
+        succes.remove(succes);
+      } else {
+        succes.textContent = "Le prenom est valide !";
+        firstNameErrorMsg.remove(firstNameErrorMsg);
+        itemQuestion[0].appendChild(succes);
+      }
+    }
+
+    //NOM
+    form.lastName.addEventListener("change", function () {
+      validationlastName(form.lastName);
+    });
+
+    function validationlastName(Name) {
+      const nameRegex = new RegExp(/^[a-zA-Z\-]+$/);
+      const testName = nameRegex.test(Name.value);
+      if (testName === false) {
+        lastNameErrorMsg.textContent = "Le nom n'est pas valide !";
+        succes.remove(succes);
+      } else {
+        succes.textContent = "Le nom est valide !";
+        lastNameErrorMsg.remove(lastNameErrorMsg);
+        itemQuestion[1].appendChild(succes);
+      }
+    }
+    // ADRESSE
+    form.address.addEventListener("change", function () {
+      validationAddress(form.address);
+    });
+
+    function validationAddress(Name) {
+      const nameRegex = new RegExp(
+        /^[0-9]{1,4}\s[a-zA-Zé'-]{3,8}\s[a-zA-zé']{3,15}\s[a-zA-z]{4,15}\s[0-9]{5}/gm
+      );
+      const testName = nameRegex.test(Name.value);
+      if (testName === false) {
+        addressErrorMsg.textContent = "L'adresse n'est pas valide !";
+        succes.remove(succes);
+      } else {
+        succes.textContent = "L'adresse est valide !";
+        addressErrorMsg.remove(addressErrorMsg);
+        itemQuestion[2].appendChild(succes);
+      }
+    }
+
+    //VILLE
+    form.city.addEventListener("change", function () {
+      validationCity(form.city);
+    });
+
+    function validationCity(City) {
+      const nameRegex = new RegExp(/^[a-zA-Z\-]+$/);
+      const testName = nameRegex.test(City.value);
+      if (testName === false) {
+        cityErrorMsg.textContent = "Le ville n'est pas valide !";
+        succes.remove(succes);
+      } else {
+        succes.textContent = "Le ville est valide !";
+        cityErrorMsg.remove(cityErrorMsg);
+        itemQuestion[3].appendChild(succes);
+      }
+    }
+
+    //EMAIL
+    form.email.addEventListener("change", function () {
+      validationEmail(form.email);
+    });
+    function validationEmail(Email) {
+      const emailRegex = new RegExp(
+        "^[a-zA-Z0-9.-_]+[@]{1}[a-zA-Z0-9.-_]+[.]{1}[a-z]{2,10}$",
+        "g"
+      );
+
+      let testEmail = emailRegex.test(Email.value);
+
+      if (testEmail === false) {
+        emailErrorMsg.textContent = "Adresse email non valide !";
+        succes.remove(succes);
+      } else {
+        succes.textContent = "Adresse email valide !";
+        emailErrorMsg.remove(emailErrorMsg);
+        itemQuestion[4].appendChild(succes);
+      }
+    }
   });
+
+//   fetch(`http://localhost:3000/api/products`)
+//   .then((response) => response.json())
+//   .then((data ) => {
+// console.log(data)
+//   })
