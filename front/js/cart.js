@@ -15,19 +15,20 @@ fetch(`http://localhost:3000/api/products`)
       idPrice.style.color = "red";
     }
 
+    
+    // PRIX TOTAL
     let totalPrice = 0;
-    const tab = [];
-    tab.push(data.price);
-    console.log(tab);
-
-    const sumWithInitial = tab.reduce((a, b) => a + b, 0);
-    console.log(sumWithInitial);
 
     for (let i = 0; i < panier.length; i++) {
+    
+    
+
       const foundID = data.find((p) => p._id === panier[i].id);
 
       if (foundID != undefined) {
         //ARTICLE
+        //ADDITION DES PRIX 
+        totalPrice += foundID.price * panier[i].quantity
         const article = document.createElement("article");
         const classCart_item = article.classList.add("cart__item");
         article.setAttribute("data-id", "product-ID");
@@ -137,9 +138,9 @@ fetch(`http://localhost:3000/api/products`)
 
         // TOTAL DE QUANTITES
         if (panier.length > 1) {
-          idPrice.innerHTML = `<p>Total (<span id="totalQuantity">${panier.length}</span> articles) : <span id="totalPrice"><!-- 84,00 --></span> €</p`;
+          idPrice.innerHTML = `<p>Total (<span id="totalQuantity">${panier.length}</span> articles) : <span id="$totalPrice">${totalPrice}</span> €</p`;
         } else {
-          idPrice.innerHTML = `<p>Total (<span id="totalQuantity">${panier.length}</span> article) : <span id="totalPrice"><!-- 84,00 --></span> €</p`;
+          idPrice.innerHTML = `<p>Total (<span id="totalQuantity">${panier.length}</span> article) : <span id="totalPrice">${totalPrice}</span> €</p`;
         }
 
         // AJOUT DU HTML
@@ -165,7 +166,10 @@ fetch(`http://localhost:3000/api/products`)
         div4.append(div6);
         div6.append(pDeleteItem);
       }
+      
     }
+
+    
     //************************************************************************************************************************** */
 
     //FORMULAIRE
@@ -277,8 +281,19 @@ fetch(`http://localhost:3000/api/products`)
     }
   });
 
-//   fetch(`http://localhost:3000/api/products`)
-//   .then((response) => response.json())
-//   .then((data ) => {
-// console.log(data)
-//   })
+  // fetch(`http://localhost:3000/api/products/order`,{
+  // method: "POST",
+  // headers:{
+  //   'content-type': "application/json"
+  //  },
+  //  body: JSON.stringify({
+  //   contact:{
+      
+  //   },
+
+  //  })
+  // })
+  // .then((response) => response.json())
+  // .then((data) => {console.log(data)});
+
+  
