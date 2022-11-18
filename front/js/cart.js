@@ -197,6 +197,7 @@ fetch(`http://localhost:3000/api/products`)
       if (testName === false) {
         firstNameErrorMsg.textContent = "Prenom non valide !";
         succes.remove(succes);
+        itemQuestion[0].appendChild(firstNameErrorMsg)
       } else {
         succes.textContent = "Le prenom est valide !";
         firstNameErrorMsg.remove(firstNameErrorMsg);
@@ -215,6 +216,7 @@ fetch(`http://localhost:3000/api/products`)
       if (testName === false) {
         lastNameErrorMsg.textContent = "Le nom n'est pas valide !";
         succes.remove(succes);
+        itemQuestion[1].appendChild(lastNameErrorMsg);
       } else {
         succes.textContent = "Le nom est valide !";
         lastNameErrorMsg.remove(lastNameErrorMsg);
@@ -234,6 +236,7 @@ fetch(`http://localhost:3000/api/products`)
       if (testName === false) {
         addressErrorMsg.textContent = "L'adresse n'est pas valide !";
         succes.remove(succes);
+        itemQuestion[2].appendChild(addressErrorMsg);
       } else {
         succes.textContent = "L'adresse est valide !";
         addressErrorMsg.remove(addressErrorMsg);
@@ -250,10 +253,11 @@ fetch(`http://localhost:3000/api/products`)
       const nameRegex = new RegExp(/^[a-zA-Z\-]+$/);
       const testName = nameRegex.test(City.value);
       if (testName === false) {
-        cityErrorMsg.textContent = "Le ville n'est pas valide !";
+        cityErrorMsg.textContent = "La ville n'est pas valide !";
         succes.remove(succes);
+        itemQuestion[3].appendChild(cityErrorMsg);
       } else {
-        succes.textContent = "Le ville est valide !";
+        succes.textContent = "La ville est valide !";
         cityErrorMsg.remove(cityErrorMsg);
         itemQuestion[3].appendChild(succes);
       }
@@ -274,6 +278,7 @@ fetch(`http://localhost:3000/api/products`)
       if (testEmail === false) {
         emailErrorMsg.textContent = "Adresse email non valide !";
         succes.remove(succes);
+        itemQuestion[4].appendChild(emailErrorMsg);
       } else {
         succes.textContent = "Adresse email valide !";
         emailErrorMsg.remove(emailErrorMsg);
