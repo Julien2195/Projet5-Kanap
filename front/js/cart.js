@@ -26,8 +26,7 @@ fetch(`http://localhost:3000/api/products`)
 
       if (foundID != undefined) {
         //ARTICLE
-        //ADDITION DES PRIX
-        totalPrice += foundID.price * panier[i].quantity;
+       
         const article = document.createElement("article");
         const classCart_item = article.classList.add("cart__item");
         article.setAttribute("data-id", "product-ID");
@@ -94,6 +93,7 @@ fetch(`http://localhost:3000/api/products`)
 
         function UpdateQuantity() {
           input.addEventListener("change", () => {
+            
             const updateQuantity = parseInt(input.value);
             let foundPanier = panier.find(
               (p) => p.id === panier.id && p.color === panier.color
@@ -102,6 +102,7 @@ fetch(`http://localhost:3000/api/products`)
             if (foundPanier != input.value) {
               panier[i].quantity = updateQuantity;
               savePanier(panier);
+              window.location.reload()
             }
 
             //CONDITION SI PANIER EST INFERIEUR A 0 OU SUPPERIEUR A 100
@@ -117,6 +118,8 @@ fetch(`http://localhost:3000/api/products`)
               savePanier(panier);
               window.location.reload();
             }
+            
+
           });
         }
 
@@ -136,6 +139,7 @@ fetch(`http://localhost:3000/api/products`)
         deletePanier();
 
         // TOTAL DE QUANTITES
+        totalPrice += foundID.price * panier[i].quantity;
         if (panier.length > 1) {
           idPrice.innerHTML = `<p>Total (<span id="totalQuantity">${panier.length}</span> articles) : <span id="$totalPrice">${totalPrice}</span> €</p`;
         } else {
