@@ -1,58 +1,57 @@
-// PAGE PRODUCTS.JS 
-
-
-//// RECUPERE L'IMG, LE PRIX, LE TITRE, LA DESCRIPTION
+// Récupère et affiche l'image, le prix, le titre et la description et appelle cet fonction dans la page product.js
 function getProductById(data) {
-    const img = document.createElement("img");
+  //Créer la balise img
+  const img = document.createElement("img");
 
-    titleH1.textContent = data.name;
-    price.textContent = data.price;
-    description.textContent = data.description;
+  //Affiche les informations de l'API
+  titleH1.textContent = data.name;
+  price.textContent = data.price;
+  description.textContent = data.description;
 
-    img.src = data.imageUrl;
-    img.alt = data.altTxt;
-    item.append(img);
+  // Récupère l'url de l'image dans l'API
+  img.src = data.imageUrl;
+  img.alt = data.altTxt;
+  item.append(img);
+}
+// Récupère le choix des couleurs et appelle cet fonction dans la page product.js
+function getColors(data) {
+  for (let color of data.colors) {
+    const option = document.createElement("option");
+
+    option.setAttribute("value", color);
+    option.textContent = color;
+    colorsSelect.append(option);
   }
-// RECUPERE LE CHOIX DES COULEURS 
-  function getColors(data) {
-    for (let color of data.colors) {
-      const option = document.createElement("option");
+}
+// *************************************************************************************************************************************
 
-      option.setAttribute("value", color);
-      option.textContent = color;
-      colorsSelect.appendChild(option);
-    }
-  }
-
-// ON SAUVEGARDE LE PANIER DANS LE  LOCALSTORAGE  + CONVERTI LES VALEURS EN CHAINE (JSON)
-
+// Sauvegarde les éléments ID, couleur(s) et quantité(s) dans le LocalStorage
 function savePanier(panier) {
-    localStorage.setItem("panier", JSON.stringify(panier));
+  localStorage.setItem("panier", JSON.stringify(panier)); // On transforme le format JSON en string  (JSON ne peux pas être lu directement)
+}
+// On récupère le LS 
+function getPanier() {
+  let panier = localStorage.getItem("panier");
+  if (panier === null) {
+    panier = []; // Si aucun éléments dans le LS (null) on créer le tableau 
+  } else {
+    return JSON.parse(panier); //Transforme string en objet JS
   }
+  return panier;
+}
+// On ajoute le panier dans le LS 
+function addPanier(items) {
+  let panier = getPanier();
 
-  // ON RECUPERE LE PANIER | SI PANIER VAUT  NULL ALORS ON CREER LE TABLEAU(PANIER) SINON ON PARSE LE PANIER
-  function getPanier() {
-    let panier = localStorage.getItem("panier");
-    if (panier === null) {
-      panier = [];
-    } else {
-      return JSON.parse(panier);
-    }
-    return panier;
+//Si foundProduct === true on ajoute la quantité sinon on créer un nouveau tableau 
+  let foundProduct = panier.find(
+    (p) => p.id === items.id && p.color === items.color
+  );
+
+  if (foundProduct != undefined) {
+    foundProduct.quantity += items.quantity; 
+  } else {
+    panier.push(items);
   }
-
-  //ON AJOUTE LE PANIER EN RECUPERANT LE getPanier() ET ON LE SAUVEGARDE avec savePanier(panier)
-  function addPanier(items) {
-    let panier = getPanier();
-    //ON CHERCHE DANS LE TABLEAU,SI l'ID & COLOR SIMILAIRE ALORS ON INCREMENTE LA QUANTITE
-    let foundProduct = panier.find((p) => p.id === items.id && p.color === items.color
-    );
-
-    if (foundProduct != undefined) {
-      foundProduct.quantity += items.quantity;
-    } else {
-      panier.push(items);
-    }
-    savePanier(panier);
-  }
-
+  savePanier(panier); 
+}

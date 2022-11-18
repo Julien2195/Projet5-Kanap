@@ -1,7 +1,3 @@
-
-
-
-
 fetch(`http://localhost:3000/api/products`)
   .then((response) => response.json())
   .then((data) => {
@@ -9,7 +5,7 @@ fetch(`http://localhost:3000/api/products`)
     const idItems = document.querySelector("#cart__items");
     const idPrice = document.querySelector(".cart__price");
 
-    // MESSAGE SI PANIER VIDE
+    // Message si panier vide
     if (panier.length === 0) {
       idPrice.textContent = "Panier Vide";
       idPrice.style.textAlign = "center";
@@ -18,19 +14,20 @@ fetch(`http://localhost:3000/api/products`)
       idPrice.style.color = "red";
     }
 
-    // PRIX TOTAL
+    // Prix total (de base vaux 0)
     let totalPrice = 0;
 
-    for (let i = 0; i < panier.length; i++) {
+    // On affiche tous les éléments stockés dans le LS dans le panier
+    for (let i in panier) {
+      //On recherche la correspondance entre l'ID de  l'API et l'ID stocké dans le panier (LS)
       const foundID = data.find((p) => p._id === panier[i].id);
 
       if (foundID != undefined) {
         //ARTICLE
-       
         const article = document.createElement("article");
         const classCart_item = article.classList.add("cart__item");
-        article.setAttribute("data-id", "product-ID");
-        article.setAttribute("data-color", "product-color");
+        article.setAttribute("data-id", panier[i].id);
+        article.setAttribute("data-color", panier[i].color);
         //DIV
         const div1 =
           document.createElement("div"); /*<div class="cart__item__img">*/
@@ -54,27 +51,33 @@ fetch(`http://localhost:3000/api/products`)
           ); /*<div class="cart__item__content__settings__delete">*/
         //P,Hn
 
+        // On créer nos balises
         const h2 = document.createElement("h2");
         const pColor = document.createElement("p");
         const pPrice = document.createElement("p");
         const pQuantity = document.createElement("p");
         const pDeleteItem = document.createElement("p");
-        //CART  IMAGE
         const img = document.createElement("img");
+
+        //Image
         div1.classList.add("cart__item__img");
         img.src = foundID.imageUrl;
         img.alt = foundID.altTxt;
+
         //CART ITEM CONTENT
         div2.classList.add("cart__item__content");
         div3.classList.add("cart__item__content__description");
         h2.textContent = data[i].description;
         pColor.textContent = panier[i].color;
         pPrice.textContent = `${foundID.price} €`;
+
         //CART ITEM SETTINGS
         div4.classList.add("cart__item__content__settings");
+
         //CART ITEM SETTINGS QUANTITY
         div5.classList.add("cart__item__content__settings__quantity");
         pQuantity.textContent = "Qté :";
+
         //CREATION DU INPUT
         const input = document.createElement("input");
         input.setAttribute("type", "number");
@@ -89,11 +92,9 @@ fetch(`http://localhost:3000/api/products`)
         pDeleteItem.classList.add("deleteItem");
         pDeleteItem.textContent = "Supprimer";
 
-        //MODIFIER QUANTITE  ET SAUVEGARDER DANS LE LS
-
+        //Si foundPanier=== true alors on change la quantité de l'input dans le LS
         function UpdateQuantity() {
           input.addEventListener("change", () => {
-            
             const updateQuantity = parseInt(input.value);
             let foundPanier = panier.find(
               (p) => p.id === panier.id && p.color === panier.color
@@ -102,15 +103,16 @@ fetch(`http://localhost:3000/api/products`)
             if (foundPanier != input.value) {
               panier[i].quantity = updateQuantity;
               savePanier(panier);
-              window.location.reload()
+              window.location.reload();
             }
 
-            //CONDITION SI PANIER EST INFERIEUR A 0 OU SUPPERIEUR A 100
+            // Condition si panier inférieur à 0 ou supperieur à 100
             if (panier[i].quantity > 100) {
               alert("Vous ne pouvez pas prendre plus de 100 articles !");
               panier[i].quantity = 100;
               savePanier(panier);
             }
+            //Si panier inférieur à 0 on supprime l'article du panier 
             if (panier[i].quantity <= 0) {
               panier = panier.filter(
                 (p) => p.id != panier[i].id || p.color != panier[i].color
@@ -118,14 +120,12 @@ fetch(`http://localhost:3000/api/products`)
               savePanier(panier);
               window.location.reload();
             }
-            
-
           });
         }
 
         UpdateQuantity();
 
-        // SUPRIMER ELEMENTS PANIER
+        // Suppression élément panier 
         function deletePanier() {
           pDeleteItem.addEventListener("click", () => {
             panier = panier.filter(
@@ -138,7 +138,7 @@ fetch(`http://localhost:3000/api/products`)
         }
         deletePanier();
 
-        // TOTAL DE QUANTITES
+        // Total des quantités 
         totalPrice += foundID.price * panier[i].quantity;
         if (panier.length > 1) {
           idPrice.innerHTML = `<p>Total (<span id="totalQuantity">${panier.length}</span> articles) : <span id="$totalPrice">${totalPrice}</span> €</p`;
@@ -146,7 +146,7 @@ fetch(`http://localhost:3000/api/products`)
           idPrice.innerHTML = `<p>Total (<span id="totalQuantity">${panier.length}</span> article) : <span id="totalPrice">${totalPrice}</span> €</p`;
         }
 
-        // AJOUT DU HTML
+        // On ajoute nos élements à leurs parents 
         idItems.append(article);
         /////////////////////
         article.append(div1);
@@ -171,9 +171,9 @@ fetch(`http://localhost:3000/api/products`)
       }
     }
 
-    //************************************************************************************************************************** */
+    //*****************************************************FORMULAIRE************************************************************* */
 
-    //FORMULAIRE
+    //On récupère nos class et ID 
     const form = document.querySelector(".cart__order__form");
     const firstNameErrorMsg = document.querySelector("#firstNameErrorMsg");
     const lastNameErrorMsg = document.querySelector("#lastNameErrorMsg");
@@ -183,7 +183,7 @@ fetch(`http://localhost:3000/api/products`)
     const itemQuestion = document.querySelectorAll(
       ".cart__order__form__question"
     );
-    //MESSAGE SUCCES
+    //Création de la balise si Regex === true
     const succes = document.createElement("p");
     succes.style.color = "green";
 
@@ -280,9 +280,9 @@ fetch(`http://localhost:3000/api/products`)
         itemQuestion[4].appendChild(succes);
       }
     }
-    
+    //ENVOYER 
     form.addEventListener("submit", (e) => {
-      e.preventDefault(e)
+      e.preventDefault(e);
       fetch(`http://localhost:3000/api/products/order`, {
         method: "POST",
         headers: {
@@ -298,10 +298,12 @@ fetch(`http://localhost:3000/api/products`)
           },
           products: panier.map((p) => p.id),
         }),
-      }).then((response) => response.json()).then((data) => {
-      ( response => response.orderId).then( window.location.href="./confirmation.html?"+data.orderId)
-
-      
       })
+        .then((response) => response.json())
+        .then((data) => {
+          ((response) => response.orderId).then(
+            (window.location.href = "./confirmation.html?" + data.orderId)
+          );
+        });
     });
   });
