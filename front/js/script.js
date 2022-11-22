@@ -1,5 +1,5 @@
 // On recupère l'API
-function fetchGetproducts() {
+
   fetch("http://localhost:3000/api/products")
     .then((response) => response.json())
     .then((data) => {
@@ -35,5 +35,5 @@ function fetchGetproducts() {
         lien.append(article);
       }
     });
-}
-fetchGetproducts();
+
+

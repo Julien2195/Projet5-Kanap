@@ -112,7 +112,7 @@ fetch(`http://localhost:3000/api/products`)
               panier[i].quantity = 100;
               savePanier(panier);
             }
-            //Si panier inférieur à 0 on supprime l'article du panier 
+            //Si panier inférieur à 0 on supprime l'article du panier
             if (panier[i].quantity <= 0) {
               panier = panier.filter(
                 (p) => p.id != panier[i].id || p.color != panier[i].color
@@ -125,7 +125,7 @@ fetch(`http://localhost:3000/api/products`)
 
         UpdateQuantity();
 
-        // Suppression élément panier 
+        // Suppression élément panier
         function deletePanier() {
           pDeleteItem.addEventListener("click", () => {
             panier = panier.filter(
@@ -138,7 +138,7 @@ fetch(`http://localhost:3000/api/products`)
         }
         deletePanier();
 
-        // Total des quantités 
+        // Total des quantités
         totalPrice += foundID.price * panier[i].quantity;
         if (panier.length > 1) {
           idPrice.innerHTML = `<p>Total (<span id="totalQuantity">${panier.length}</span> articles) : <span id="$totalPrice">${totalPrice}</span> €</p`;
@@ -146,7 +146,7 @@ fetch(`http://localhost:3000/api/products`)
           idPrice.innerHTML = `<p>Total (<span id="totalQuantity">${panier.length}</span> article) : <span id="totalPrice">${totalPrice}</span> €</p`;
         }
 
-        // On ajoute nos élements à leurs parents 
+        // On ajoute nos élements à leurs parents
         idItems.append(article);
         /////////////////////
         article.append(div1);
@@ -173,7 +173,7 @@ fetch(`http://localhost:3000/api/products`)
 
     //*****************************************************FORMULAIRE************************************************************* */
 
-    //On récupère nos class et ID 
+    //On récupère nos class et ID
     const form = document.querySelector(".cart__order__form");
     const firstNameErrorMsg = document.querySelector("#firstNameErrorMsg");
     const lastNameErrorMsg = document.querySelector("#lastNameErrorMsg");
@@ -197,7 +197,7 @@ fetch(`http://localhost:3000/api/products`)
       if (testName === false) {
         firstNameErrorMsg.textContent = "Prenom non valide !";
         succes.remove(succes);
-        itemQuestion[0].appendChild(firstNameErrorMsg)
+        itemQuestion[0].appendChild(firstNameErrorMsg);
       } else {
         succes.textContent = "Le prenom est valide !";
         firstNameErrorMsg.remove(firstNameErrorMsg);
@@ -230,7 +230,7 @@ fetch(`http://localhost:3000/api/products`)
 
     function validationAddress(Name) {
       const nameRegex = new RegExp(
-        /^[0-9]{1,4}\s[a-zA-Zé'-]{3,8}\s[a-zA-zé']{3,15}\s[a-zA-z]{4,15}\s[0-9]{5}/gm
+        /([0-9]*)?([-'\s][a-zA-Zàâäéèêëïîôöùûüç]+)+$/
       );
       const testName = nameRegex.test(Name.value);
       if (testName === false) {
@@ -250,7 +250,9 @@ fetch(`http://localhost:3000/api/products`)
     });
 
     function validationCity(City) {
-      const nameRegex = new RegExp(/^[a-zA-Z\-]+$/);
+      const nameRegex = new RegExp(
+        /^[0-9]{5}([-'\s][a-zA-Zàâäéèêëïîôöùûüç]+)+$/
+      );
       const testName = nameRegex.test(City.value);
       if (testName === false) {
         cityErrorMsg.textContent = "La ville n'est pas valide !";
@@ -285,7 +287,15 @@ fetch(`http://localhost:3000/api/products`)
         itemQuestion[4].appendChild(succes);
       }
     }
-    //ENVOYER 
+    //ENVOYER
+    //On vide le panier une fois la commande passer
+    function updatePanier() {
+      panier = panier.filter(
+        (p) => p.id != panier[i].id || p.color != panier[i].color
+      );
+      savePanier(panier);
+    }
+
     form.addEventListener("submit", (e) => {
       e.preventDefault(e);
       fetch(`http://localhost:3000/api/products/order`, {
@@ -307,7 +317,9 @@ fetch(`http://localhost:3000/api/products`)
         .then((response) => response.json())
         .then((data) => {
           ((response) => response.orderId).then(
-            (window.location.href = "./confirmation.html?" + data.orderId)
+            (window.location.href = "./confirmation.html?" + data.orderId).then(
+              updatePanier()
+            )
           );
         });
     });
