@@ -139,7 +139,10 @@ fetch(`http://localhost:3000/api/products`)
         deletePanier();
 
         // Total des quantités
+        function calculPrixTotal() {}
         totalPrice += foundID.price * panier[i].quantity;
+        savePanier(panier);
+        calculPrixTotal();
         if (panier.length > 1) {
           idPrice.innerHTML = `<p>Total (<span id="totalQuantity">${panier.length}</span> articles) : <span id="$totalPrice">${totalPrice}</span> €</p`;
         } else {
@@ -290,9 +293,7 @@ fetch(`http://localhost:3000/api/products`)
     //ENVOYER
     //On vide le panier une fois la commande passer
     function updatePanier() {
-      panier = panier.filter(
-        (p) => p.id != panier[i].id || p.color != panier[i].color
-      );
+      localStorage.removeItem("panier");
       savePanier(panier);
     }
 
