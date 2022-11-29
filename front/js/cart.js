@@ -14,9 +14,9 @@ fetch(`http://localhost:3000/api/products`)
       idPrice.style.color = "red";
     }
 
-    // Prix total (de base vaux 0)
-    let totalPrice = 0;
-
+    // Prix et quantité total  (de base vaux 0)
+    let prixTotal = 0;
+    let quantiteTotal = 0;
     // On affiche tous les éléments stockés dans le LS dans le panier
     for (let i in panier) {
       //On recherche la correspondance entre l'ID de  l'API et l'ID stocké dans le panier (LS)
@@ -93,36 +93,40 @@ fetch(`http://localhost:3000/api/products`)
         pDeleteItem.textContent = "Supprimer";
 
         //Si foundPanier=== true alors on change la quantité de l'input dans le LS
-        function UpdateQuantity() {
-          input.addEventListener("change", () => {
-            const updateQuantity = parseInt(input.value);
-            let foundPanier = panier.find(
-              (p) => p.id === panier.id && p.color === panier.color
+
+        input.addEventListener("change", () => {
+          const updateQuantity = parseInt(input.value);
+          let foundPanier = panier.find(
+            (p) => p.id === panier.id && p.color === panier.color
+          );
+
+          if (foundPanier != input.value) {
+          }
+          panier[i].quantity = updateQuantity;
+
+          savePanier(panier);
+
+          if (updateQuantity > 1) {
+            idPrice.innerHTML = `<p>Total (<span id="totalQuantity">${updateQuantity}</span> articles) : <span id="$totalPrice">${prixTotal}</span> €</p`;
+          } else {
+            idPrice.innerHTML = `<p>Total (<span id="totalQuantity">${updateQuantity}</span> article) : <span id="totalPrice">${prixTotal}</span> €</p`;
+          }
+
+          // Condition si panier inférieur à 0 ou supperieur à 100
+          if (panier[i].quantity > 100) {
+            alert("Vous ne pouvez pas prendre plus de 100 articles !");
+            panier[i].quantity = 100;
+            savePanier(panier);
+          }
+          //Si panier inférieur à 0 on supprime l'article du panier
+          if (panier[i].quantity <= 0) {
+            panier = panier.filter(
+              (p) => p.id != panier[i].id || p.color != panier[i].color
             );
-
-            if (foundPanier != input.value) {
-              panier[i].quantity = updateQuantity;
-              savePanier(panier);
-            }
-
-            // Condition si panier inférieur à 0 ou supperieur à 100
-            if (panier[i].quantity > 100) {
-              alert("Vous ne pouvez pas prendre plus de 100 articles !");
-              panier[i].quantity = 100;
-              savePanier(panier);
-            }
-            //Si panier inférieur à 0 on supprime l'article du panier
-            if (panier[i].quantity <= 0) {
-              panier = panier.filter(
-                (p) => p.id != panier[i].id || p.color != panier[i].color
-              );
-              savePanier(panier);
-              window.location.reload();
-            }
-          });
-        }
-
-        UpdateQuantity();
+            savePanier(panier);
+            window.location.reload();
+          }
+        });
 
         // Suppression élément panier
         function deletePanier() {
@@ -138,14 +142,14 @@ fetch(`http://localhost:3000/api/products`)
         deletePanier();
 
         // Total des quantités
-        function calculPrixTotal() {}
-        totalPrice += foundID.price * panier[i].quantity;
-        savePanier(panier);
-        calculPrixTotal();
-        if (panier.length > 1) {
-          idPrice.innerHTML = `<p>Total (<span id="totalQuantity">${panier.length}</span> articles) : <span id="$totalPrice">${totalPrice}</span> €</p`;
+        let resultNbrQuantite = quantiteTotal += panier[i].quantity;
+        console.log(resultNbrQuantite);
+        prixTotal += foundID.price * panier[i].quantity;
+        //On affiche par default les quantités et prix , si l'utilisateur change de quantité alors on se reférer au addEventListener('change')
+        if (resultNbrQuantite > 1) {
+          idPrice.innerHTML = `<p>Total (<span id="totalQuantity">${resultNbrQuantite}</span> articles) : <span id="$totalPrice">${prixTotal}</span> €</p`;
         } else {
-          idPrice.innerHTML = `<p>Total (<span id="totalQuantity">${panier.length}</span> article) : <span id="totalPrice">${totalPrice}</span> €</p`;
+          idPrice.innerHTML = `<p>Total (<span id="totalQuantity">${resultNbrQuantite}</span> article) : <span id="totalPrice">${prixTotal}</span> €</p`;
         }
 
         // On ajoute nos élements à leurs parents
