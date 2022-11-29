@@ -103,7 +103,6 @@ fetch(`http://localhost:3000/api/products`)
             if (foundPanier != input.value) {
               panier[i].quantity = updateQuantity;
               savePanier(panier);
-              window.location.reload();
             }
 
             // Condition si panier inférieur à 0 ou supperieur à 100
@@ -186,14 +185,18 @@ fetch(`http://localhost:3000/api/products`)
     const itemQuestion = document.querySelectorAll(
       ".cart__order__form__question"
     );
+
+    const inputs = document.querySelectorAll("input");
     //Création de la balise si Regex === true
     const succes = document.createElement("p");
     succes.style.color = "green";
 
     //PRENOM
+
     form.firstName.addEventListener("change", function () {
       validationfirstName(form.firstName);
     });
+
     function validationfirstName(Name) {
       const nameRegex = new RegExp(/^[a-zA-Z\-]+$/);
       const testName = nameRegex.test(Name.value);
@@ -201,10 +204,12 @@ fetch(`http://localhost:3000/api/products`)
         firstNameErrorMsg.textContent = "Prenom non valide !";
         succes.remove(succes);
         itemQuestion[0].appendChild(firstNameErrorMsg);
+        return false;
       } else {
         succes.textContent = "Le prenom est valide !";
         firstNameErrorMsg.remove(firstNameErrorMsg);
         itemQuestion[0].appendChild(succes);
+        return true;
       }
     }
 
@@ -220,10 +225,12 @@ fetch(`http://localhost:3000/api/products`)
         lastNameErrorMsg.textContent = "Le nom n'est pas valide !";
         succes.remove(succes);
         itemQuestion[1].appendChild(lastNameErrorMsg);
+        return false;
       } else {
         succes.textContent = "Le nom est valide !";
         lastNameErrorMsg.remove(lastNameErrorMsg);
         itemQuestion[1].appendChild(succes);
+        return true;
       }
     }
     // ADRESSE
@@ -240,10 +247,12 @@ fetch(`http://localhost:3000/api/products`)
         addressErrorMsg.textContent = "L'adresse n'est pas valide !";
         succes.remove(succes);
         itemQuestion[2].appendChild(addressErrorMsg);
+        return false;
       } else {
         succes.textContent = "L'adresse est valide !";
         addressErrorMsg.remove(addressErrorMsg);
         itemQuestion[2].appendChild(succes);
+        return true;
       }
     }
 
@@ -261,10 +270,12 @@ fetch(`http://localhost:3000/api/products`)
         cityErrorMsg.textContent = "La ville n'est pas valide !";
         succes.remove(succes);
         itemQuestion[3].appendChild(cityErrorMsg);
+        return false;
       } else {
         succes.textContent = "La ville est valide !";
         cityErrorMsg.remove(cityErrorMsg);
         itemQuestion[3].appendChild(succes);
+        return true;
       }
     }
 
@@ -284,44 +295,56 @@ fetch(`http://localhost:3000/api/products`)
         emailErrorMsg.textContent = "Adresse email non valide !";
         succes.remove(succes);
         itemQuestion[4].appendChild(emailErrorMsg);
+        return false;
       } else {
         succes.textContent = "Adresse email valide !";
         emailErrorMsg.remove(emailErrorMsg);
         itemQuestion[4].appendChild(succes);
+        return true;
       }
     }
     //ENVOYER
     //On vide le panier une fois la commande passer
     function updatePanier() {
       localStorage.removeItem("panier");
-      savePanier(panier);
     }
 
     form.addEventListener("submit", (e) => {
       e.preventDefault(e);
-      fetch(`http://localhost:3000/api/products/order`, {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-        },
-        body: JSON.stringify({
-          contact: {
-            firstName: firstName.value,
-            lastName: lastName.value,
-            address: address.value,
-            city: city.value,
-            email: email.value,
+      if (
+        //Condition si les Regex sont true envoie du fomulaire sinon message d'erreur
+        validationfirstName(form.firstName) &&
+        validationlastName(form.lastName) &&
+        validationAddress(form.address) &&
+        validationCity(form.city) &&
+        validationEmail(form.email)
+      ) {
+        fetch(`http://localhost:3000/api/products/order`, {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
           },
-          products: panier.map((p) => p.id),
-        }),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          ((response) => response.orderId).then(
-            (window.location.href = "./confirmation.html?" + data.orderId).then(
-              updatePanier()
-            )
-          );
-        });
+          body: JSON.stringify({
+            contact: {
+              firstName: firstName.value,
+              lastName: lastName.value,
+              address: address.value,
+              city: city.value,
+              email: email.value,
+            },
+            products: panier.map((p) => p.id),
+          }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            ((response) => response.orderId).then(
+              (window.location.href = `./confirmation.html?${data.orderId}`).then(
+                updatePanier()
+              )
+            );
+          });
+      } else {
+        alert("Forumaire non valide !");
+      }
     });
   });
