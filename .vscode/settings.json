@@ -1,0 +1,8 @@
+{
+  "editor.formatOnPaste": false,
+  "editor.formatOnType": true,
+  "editor.autoIndent": "full",
+  "editor.wrappingIndent": "same",
+  "diffEditor.wordWrap": "on",
+  "editor.formatOnSave": true
+}

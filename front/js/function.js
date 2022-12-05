@@ -71,7 +71,29 @@ function addPanier(items) {
             savePanier(panier);
             window.location.reload();
           });
-        }
+}
+        
+function getNumberProduct() {
+  let basket = getPanier();
+  let number = 0;
+  let totalQuantity = document.querySelector('#totalQuantity');
+  for (let product of basket) {
+    number += product.quantity;
+  }
+  totalQuantity.innerText = number;
+}
+
+function getTotalPrice() {
+  let basket = getPanier();
+  let total = 0;
+  let totalPrice = document.querySelector('#totalPrice');
+  for (let product of basket) {
+    total += product.quantity * product.price;
+    console.log(product.price);
+  }
+  totalPrice.innerText = total;
+  
+}
 // *******************************************************************************************************************************
 // ********************************************************FORMULAIRE ************************************************************
 
