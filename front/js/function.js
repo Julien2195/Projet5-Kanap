@@ -102,7 +102,7 @@ const inputs = document.querySelectorAll("input");
 const succes = document.createElement("p");
 succes.style.color = "green";
 
-const form = document.querySelector(".cart__order__form");
+const formElement = document.querySelector(".cart__order__form");
 const firstNameErrorMsg = document.querySelector("#firstNameErrorMsg");
 const lastNameErrorMsg = document.querySelector("#lastNameErrorMsg");
 const addressErrorMsg = document.querySelector("#addressErrorMsg");

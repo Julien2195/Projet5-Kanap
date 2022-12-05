@@ -68,10 +68,10 @@ fetch(`http://localhost:3000/api/products`)
         //CART ITEM CONTENT
         div2.classList.add("cart__item__content");
         div3.classList.add("cart__item__content__description");
-        h2.textContent = panier[i].description;
+        h2.textContent = data[i].description;
         pColor.textContent = panier[i].color;
-        // pPrice.textContent = `${foundID.price} €`;
-        pPrice.textContent = panier[i].price;
+        pPrice.textContent = `${foundID.price} €`;
+
         //CART ITEM SETTINGS
         div4.classList.add("cart__item__content__settings");
 
@@ -94,25 +94,30 @@ fetch(`http://localhost:3000/api/products`)
         pDeleteItem.textContent = "Supprimer";
 
         //Si foundPanier=== true alors on change la quantité de l'input dans le LS
-
+        const foundID2 = foundID;
         input.addEventListener("change", () => {
           const updateQuantity = parseInt(input.value);
 
           panier[i].quantity = updateQuantity;
           //Calculs des quantités dynamiquement
           let quantiteTotalDynamique = 0;
+          let prixTotalDynamique = 0;
+
           panier.forEach((e) => {
+            const foundID = data.find((p) => p._id === e.id);
+
             quantiteTotalDynamique += e.quantity;
+            prixTotalDynamique += foundID.price * e.quantity;
+            console.log(foundID, e);
           });
 
           savePanier(panier);
-          // if (quantiteTotalDynamique > 1) {
-          //   idPrice.innerHTML = `<p>Total (<span id="totalQuantity">${quantiteTotalDynamique}</span> articles) : <span id="$totalPrice">${prixTotalDynamiquement}</span> €</p`;
-          // } else {
-          //   idPrice.innerHTML = `<p>Total (<span id="totalQuantity">${quantiteTotalDynamique}</span> article) : <span id="totalPrice">${prixTotalDynamiquement}</span> €</p`;
-          // }
-          getNumberProduct();
-          getTotalPrice();
+          if (quantiteTotalDynamique > 1) {
+            idPrice.innerHTML = `<p>Total (<span id="totalQuantity">${quantiteTotalDynamique}</span> articles) : <span id="$totalPrice">${prixTotalDynamique}</span> €</p`;
+          } else {
+            idPrice.innerHTML = `<p>Total (<span id="totalQuantity">${quantiteTotalDynamique}</span> article) : <span id="totalPrice">${prixTotalDynamique}</span> €</p`;
+          }
+
           // Condition si panier inférieur à 0 ou supperieur à 100
           if (panier[i].quantity > 100) {
             alert("Vous ne pouvez pas prendre plus de 100 articles !");
@@ -141,21 +146,17 @@ fetch(`http://localhost:3000/api/products`)
           });
         }
         deletePanier();
-
+        quantiteTotal += panier[i].quantity;
         // Prix Total
-        // prixTotal += foundID.price * panier[i].quantity;
+        prixTotal += foundID.price * panier[i].quantity;
 
-        //calcul quantité panier
-        // quantiteTotal+= panier[i].quantity
         //On affiche par default les quantités et prix , si l'utilisateur change de quantité alors on se reférer au addEventListener('change')
-        // if (quantiteTotal > 1) {
-        //   idPrice.innerHTML = `<p>Total (<span id="totalQuantity">${quantiteTotal}</span> articles) : <span id="$totalPrice">${prixTotal}</span> €</p`;
-        // } else {
-        //   idPrice.innerHTML = `<p>Total (<span id="totalQuantity">${quantiteTotal}</span> article) : <span id="totalPrice">${prixTotal}</span> €</p`;
-        // }
+        if (quantiteTotal > 1) {
+          idPrice.innerHTML = `<p>Total (<span id="totalQuantity">${quantiteTotal}</span> articles) : <span id="$totalPrice">${prixTotal}</span> €</p`;
+        } else {
+          idPrice.innerHTML = `<p>Total (<span id="totalQuantity">${quantiteTotal}</span> article) : <span id="totalPrice">${prixTotal}</span> €</p`;
+        }
 
-        getNumberProduct();
-        getTotalPrice();
         // On ajoute nos élements à leurs parents
         idItems.append(article);
         /////////////////////
@@ -181,48 +182,48 @@ fetch(`http://localhost:3000/api/products`)
       }
     }
 
-    //*****************************************************FORMULAIRE************************************************************* */
+    //*****************************************************formElementULAIRE************************************************************* */
 
     //PRENOM
 
-    form.firstName.addEventListener("change", function () {
-      validationfirstName(form.firstName);
+    formElement.firstName.addEventListener("change", function () {
+      validationfirstName(formElement.firstName);
     });
 
     //NOM
-    form.lastName.addEventListener("change", function () {
-      validationlastName(form.lastName);
+    formElement.lastName.addEventListener("change", function () {
+      validationlastName(formElement.lastName);
     });
 
     // ADRESSE
-    form.address.addEventListener("change", function () {
-      validationAddress(form.address);
+    formElement.address.addEventListener("change", function () {
+      validationAddress(formElement.address);
     });
 
     //VILLE
-    form.city.addEventListener("change", function () {
-      validationCity(form.city);
+    formElement.city.addEventListener("change", function () {
+      validationCity(formElement.city);
     });
 
     //EMAIL
-    form.email.addEventListener("change", function () {
-      validationEmail(form.email);
+    formElement.email.addEventListener("change", function () {
+      validationEmail(formElement.email);
     });
 
     //ENVOYER
 
-    form.addEventListener("submit", (e) => {
+    formElement.addEventListener("submit", (e) => {
       e.preventDefault(e);
       if (
         //Condition si les Regex sont true envoie du fomulaire sinon message d'erreur
-        validationfirstName(form.firstName) &&
-        validationlastName(form.lastName) &&
-        validationAddress(form.address) &&
-        validationCity(form.city) &&
-        validationEmail(form.email)
+        validationfirstName(formElement.firstName) &&
+        validationlastName(formElement.lastName) &&
+        validationAddress(formElement.address) &&
+        validationCity(formElement.city) &&
+        validationEmail(formElement.email)
       ) {
-        //Envoi formulaire
-        envoieFormulaire();
+        //Envoi formElementulaire
+        envoieformElementulaire();
       } else {
         alert("Forumaire non valide !");
       }
