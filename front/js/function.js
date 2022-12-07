@@ -1,30 +1,3 @@
-// ********************************************************PRODUCT ************************************************************
-
-// Récupère et affiche l'image, le prix, le titre et la description et appelle cet fonction dans la page product.js
-function getProductById(data) {
-  //Créer la balise img
-  const img = document.createElement("img");
-
-  //Affiche les informations de l'API
-  titleH1.textContent = data.name;
-  price.textContent = data.price;
-  description.textContent = data.description;
-
-  // Récupère l'url de l'image dans l'API
-  img.src = data.imageUrl;
-  img.alt = data.altTxt;
-  item.append(img);
-}
-// Récupère le choix des couleurs et appelle cet fonction dans la page product.js
-function getColors(data) {
-  for (let color of data.colors) {
-    const option = document.createElement("option");
-
-    option.setAttribute("value", color);
-    option.textContent = color;
-    colorsSelect.append(option);
-  }
-}
 // ********************************************************LOCAL STORAGE ************************************************************
 
 // Sauvegarde les éléments ID, couleur(s) et quantité(s) dans le LocalStorage
@@ -58,43 +31,6 @@ function addPanier(items) {
   savePanier(panier);
 }
 
-
-
-// *********************************************************CARDS*****************************************************************
-// Suppression élément panier
-        function deletePanier() {
-          pDeleteItem.addEventListener("click", () => {
-            panier = panier.filter(
-              (p) => p.id != panier[i].id || p.color != panier[i].color
-            );
-            alert("Article supprimé");
-            savePanier(panier);
-            window.location.reload();
-          });
-}
-        
-function getNumberProduct() {
-  let basket = getPanier();
-  let number = 0;
-  let totalQuantity = document.querySelector('#totalQuantity');
-  for (let product of basket) {
-    number += product.quantity;
-  }
-  totalQuantity.innerText = number;
-}
-
-function getTotalPrice() {
-  let basket = getPanier();
-  let total = 0;
-  let totalPrice = document.querySelector('#totalPrice');
-  for (let product of basket) {
-    total += product.quantity * product.price;
-    console.log(product.price);
-  }
-  totalPrice.innerText = total;
-  
-}
-// *******************************************************************************************************************************
 // ********************************************************FORMULAIRE ************************************************************
 
 const inputs = document.querySelectorAll("input");

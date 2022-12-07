@@ -7,8 +7,8 @@ const priceContainer = document.querySelector("#totalPrice");
 fetch(`http://localhost:3000/api/products`)
   .then((response) => response.json())
   .then((data) => {
-      onDataAvailable(data);
-      calcul(data);
+    onDataAvailable(data);
+    calcul(data);
   });
 //Condition si le LS est vide on affiche la fonction showMessage sinon on affiche nos articles
 function onDataAvailable(data) {
@@ -26,7 +26,7 @@ function onDataAvailable(data) {
   }
 }
 
-//Panier vide 
+//Panier vide
 function showMessage() {
   itemContainer.textContent = " Panier vide !";
   itemContainer.style.textAlign = "center";
@@ -42,11 +42,11 @@ function createArticle(data, foundID, item) {
   article.setAttribute("data-color", item.color);
 
   itemContainer.append(article);
-//Affiche les images
+  //Affiche les images
   createImage(data, foundID, item, article);
 }
 // Fonction pour afficher les images du produit
-function createImage(data,foundID, item, article) {
+function createImage(data, foundID, item, article) {
   const createImgDiv = document.createElement("div");
   createImgDiv.classList.add("cart__item__img");
   const img = document.createElement("img");
@@ -56,9 +56,8 @@ function createImage(data,foundID, item, article) {
 
   article.append(createImgDiv);
   createImgDiv.append(img);
-//Container qui englobe les éléments 
-    containerElements(data, foundID, item, article);
-
+  //Container qui englobe les éléments
+  containerElements(data, foundID, item, article);
 }
 
 function containerElements(data, foundID, item, article) {
@@ -66,12 +65,12 @@ function containerElements(data, foundID, item, article) {
   contentGlobalDiv.classList.add("cart__item__content");
 
   article.append(contentGlobalDiv);
-//Affiche les descriptions des articles
+  //Affiche les descriptions des articles
   contentDescription(foundID, item, contentGlobalDiv);
   contentSettings(data, foundID, item, contentGlobalDiv);
 }
 //Créer les descriptions des articles
-function contentDescription( foundID, item, contentGlobalDiv) {
+function contentDescription(foundID, item, contentGlobalDiv) {
   const contentDiv = document.createElement("div");
   contentDiv.classList.add("cart__item__content__description");
 
@@ -94,7 +93,7 @@ function contentSettings(data, foundID, item, contentGlobalDiv) {
   settingsDiv.classList.add("cart__item__content__settings");
 
   contentGlobalDiv.append(settingsDiv);
-//Affiche l'input avec la qté
+  //Affiche l'input avec la qté
   contentSettingsQuantity(data, foundID, item, settingsDiv);
 
   deleteItem(foundID, item, settingsDiv);
@@ -125,10 +124,10 @@ function contentSettingsQuantity(data, foundID, item, settingsDiv) {
   //Modification de la nouvelle quantité
   inputQuantity.addEventListener("change", () => {
     const updateQuantity = parseInt(inputQuantity.value);
-    
+
     item.quantity = updateQuantity;
     savePanier(panier);
-    
+
     //Condition si article <1 ou >100
     if (item.quantity < 1) {
       deleteItemAction(foundID, item);
@@ -144,10 +143,8 @@ function contentSettingsQuantity(data, foundID, item, settingsDiv) {
       savePanier(panier);
     }
 
-    calcul(data)
-      
+    calcul(data);
   });
-  
 }
 
 //Ajout du fonction supprimer
@@ -161,7 +158,7 @@ function deleteItem(foundID, item, settingsDiv) {
   pDelete.textContent = "Supprimer";
 
   pDelete.addEventListener("click", () => {
-    deleteItemAction( item);
+    deleteItemAction(item);
     alert("Article supprimé");
     savePanier(panier);
     window.location.reload();
@@ -171,73 +168,71 @@ function deleteItem(foundID, item, settingsDiv) {
 }
 
 //Action supprimé
-function deleteItemAction( item) {
+function deleteItemAction(item) {
   panier = panier.filter((p) => p.id != item.id || p.color != item.color);
 }
 
 //Calcul de la quantité et prix !
 function calcul(data) {
+  let totalQuantity = 0;
+  let totalPrice = 0;
 
-    let totalQuantity = 0;
-    let totalPrice = 0;
-
-    for(let i in panier){
-        const item = panier[i];
-        const foundID = data.find((p) => p._id === item.id);
-        if (foundID == undefined) {
-          continue;
-        }
-        totalQuantity += item.quantity;
-        totalPrice += foundID.price * item.quantity;
+  for (let i in panier) {
+    const item = panier[i];
+    const foundID = data.find((p) => p._id === item.id);
+    if (foundID == undefined) {
+      continue;
     }
-    quantityContainer.textContent = totalQuantity;
-    priceContainer.textContent = totalPrice;
+    totalQuantity += item.quantity;
+    totalPrice += foundID.price * item.quantity;
+  }
+  quantityContainer.textContent = totalQuantity;
+  priceContainer.textContent = totalPrice;
 }
 
+//*****************************************************FORMULAIRE************************************************************* */
 
-    //*****************************************************FORMULAIRE************************************************************* */
+//PRENOM
 
-    //PRENOM
+formElement.firstName.addEventListener("change", function () {
+  validationfirstName(formElement.firstName);
+});
 
-    formElement.firstName.addEventListener("change", function () {
-      validationfirstName(formElement.firstName);
-    });
+//NOM
+formElement.lastName.addEventListener("change", function () {
+  validationlastName(formElement.lastName);
+});
 
-    //NOM
-    formElement.lastName.addEventListener("change", function () {
-      validationlastName(formElement.lastName);
-    });
+// ADRESSE
+formElement.address.addEventListener("change", function () {
+  validationAddress(formElement.address);
+});
 
-    // ADRESSE
-    formElement.address.addEventListener("change", function () {
-      validationAddress(formElement.address);
-    });
+//VILLE
+formElement.city.addEventListener("change", function () {
+  validationCity(formElement.city);
+});
 
-    //VILLE
-    formElement.city.addEventListener("change", function () {
-      validationCity(formElement.city);
-    });
+//EMAIL
+formElement.email.addEventListener("change", function () {
+  validationEmail(formElement.email);
+});
 
-    //EMAIL
-    formElement.email.addEventListener("change", function () {
-      validationEmail(formElement.email);
-    });
+//ENVOYER
 
-    //ENVOYER
-
-    formElement.addEventListener("submit", (e) => {
-      e.preventDefault(e);
-      if (
-        //Condition si les Regex sont true envoie du fomulaire sinon message d'erreur
-        validationfirstName(formElement.firstName) &&
-        validationlastName(formElement.lastName) &&
-        validationAddress(formElement.address) &&
-        validationCity(formElement.city) &&
-        validationEmail(formElement.email)
-      ) {
-        //Envoi formElementulaire
-        envoieFormulaire();
-      } else {
-        alert("Formulaire non valide !");
-      }
-    });
+formElement.addEventListener("submit", (e) => {
+  e.preventDefault(e);
+  if (
+    //Condition si les Regex sont true envoie du fomulaire sinon message d'erreur
+    validationfirstName(formElement.firstName) &&
+    validationlastName(formElement.lastName) &&
+    validationAddress(formElement.address) &&
+    validationCity(formElement.city) &&
+    validationEmail(formElement.email)
+  ) {
+    //Envoi formElementulaire
+    envoieFormulaire();
+  } else {
+    alert("Formulaire non valide !");
+  }
+});

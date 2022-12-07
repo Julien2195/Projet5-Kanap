@@ -12,6 +12,32 @@ const colorsSelect = document.querySelector("#colors");
 const card = document.querySelector("#addToCart");
 const nbrOfQuantity = document.querySelector("#quantity");
 
+// Récupère et affiche l'image, le prix, le titre et la description et appelle cet fonction dans la page product.js
+function getProductById(data) {
+  //Créer la balise img
+  const img = document.createElement("img");
+
+  //Affiche les informations de l'API
+  titleH1.textContent = data.name;
+  price.textContent = data.price;
+  description.textContent = data.description;
+
+  // Récupère l'url de l'image dans l'API
+  img.src = data.imageUrl;
+  img.alt = data.altTxt;
+  item.append(img);
+}
+// Récupère le choix des couleurs et appelle cet fonction dans la page product.js
+function getColors(data) {
+  for (let color of data.colors) {
+    const option = document.createElement("option");
+
+    option.setAttribute("value", color);
+    option.textContent = color;
+    colorsSelect.append(option);
+  }
+}
+
 fetch(`http://localhost:3000/api/products/${myID}`)
   .then((response) => response.json())
   .then((data) => {
