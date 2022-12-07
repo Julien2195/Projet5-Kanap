@@ -1,188 +1,201 @@
+const itemContainer = document.querySelector("#cart__items");
+let panier = getPanier();
+
+const quantityContainer = document.querySelector("#totalQuantity");
+const priceContainer = document.querySelector("#totalPrice");
+//Appelle l'API
 fetch(`http://localhost:3000/api/products`)
   .then((response) => response.json())
   .then((data) => {
-    let panier = getPanier();
-    const idItems = document.querySelector("#cart__items");
-    const idPrice = document.querySelector(".cart__price");
+      onDataAvailable(data);
+      calcul(data);
+  });
+//Condition si le LS est vide on affiche la fonction showMessage sinon on affiche nos articles
+function onDataAvailable(data) {
+  if (panier.length === 0) {
+    showMessage();
+    return;
+  }
+  for (let i in panier) {
+    const item = panier[i];
+    const foundID = data.find((p) => p._id === item.id);
+    if (foundID === undefined) {
+      continue;
+    }
+    createArticle(data, foundID, item);
+  }
+}
 
-    // Message si panier vide
-    if (panier.length === 0) {
-      idPrice.textContent = "Panier Vide";
-      idPrice.style.textAlign = "center";
-      idPrice.style.fontWeight = "600";
-      idPrice.style.fontSize = "20px";
-      idPrice.style.color = "red";
+//Panier vide 
+function showMessage() {
+  itemContainer.textContent = " Panier vide !";
+  itemContainer.style.textAlign = "center";
+  itemContainer.style.fontWeight = "600";
+  itemContainer.style.fontSize = "20px";
+  itemContainer.style.color = "red";
+}
+//creation du container article
+function createArticle(data, foundID, item) {
+  const article = document.createElement("article");
+  article.classList.add("cart__item");
+  article.setAttribute("data-id", item.id);
+  article.setAttribute("data-color", item.color);
+
+  itemContainer.append(article);
+//Affiche les images
+  createImage(data, foundID, item, article);
+}
+// Fonction pour afficher les images du produit
+function createImage(data,foundID, item, article) {
+  const createImgDiv = document.createElement("div");
+  createImgDiv.classList.add("cart__item__img");
+  const img = document.createElement("img");
+
+  img.src = foundID.imageUrl;
+  img.alt = foundID.altTxt;
+
+  article.append(createImgDiv);
+  createImgDiv.append(img);
+//Container qui englobe les éléments 
+    containerElements(data, foundID, item, article);
+
+}
+
+function containerElements(data, foundID, item, article) {
+  const contentGlobalDiv = document.createElement("div");
+  contentGlobalDiv.classList.add("cart__item__content");
+
+  article.append(contentGlobalDiv);
+//Affiche les descriptions des articles
+  contentDescription(foundID, item, contentGlobalDiv);
+  contentSettings(data, foundID, item, contentGlobalDiv);
+}
+//Créer les descriptions des articles
+function contentDescription( foundID, item, contentGlobalDiv) {
+  const contentDiv = document.createElement("div");
+  contentDiv.classList.add("cart__item__content__description");
+
+  const h2 = document.createElement("h2");
+  const pColor = document.createElement("p");
+  const pPrice = document.createElement("p");
+
+  h2.textContent = foundID.name;
+  pColor.textContent = item.color;
+  pPrice.textContent = `${foundID.price} €`;
+
+  contentGlobalDiv.append(contentDiv);
+  contentDiv.append(h2);
+  contentDiv.append(pColor);
+  contentDiv.append(pPrice);
+}
+
+function contentSettings(data, foundID, item, contentGlobalDiv) {
+  const settingsDiv = document.createElement("div");
+  settingsDiv.classList.add("cart__item__content__settings");
+
+  contentGlobalDiv.append(settingsDiv);
+//Affiche l'input avec la qté
+  contentSettingsQuantity(data, foundID, item, settingsDiv);
+
+  deleteItem(foundID, item, settingsDiv);
+}
+
+//création de la qté
+function contentSettingsQuantity(data, foundID, item, settingsDiv) {
+  const settingsQuantityDiv = document.createElement("div");
+  settingsQuantityDiv.classList.add("cart__item__content__settings__quantity");
+
+  settingsDiv.append(settingsQuantityDiv);
+
+  const pQuantity = document.createElement("p");
+  pQuantity.textContent = "Qté :";
+
+  settingsQuantityDiv.append(pQuantity);
+
+  //création de Input
+  const inputQuantity = document.createElement("input");
+  inputQuantity.classList.add("itemQuantity");
+  inputQuantity.setAttribute("type", "number");
+  inputQuantity.setAttribute("name", "inputQuantity");
+  inputQuantity.setAttribute("min", 1);
+  inputQuantity.setAttribute("max", 100);
+  inputQuantity.setAttribute("value", item.quantity);
+  settingsQuantityDiv.append(inputQuantity);
+
+  //Modification de la nouvelle quantité
+  inputQuantity.addEventListener("change", () => {
+    const updateQuantity = parseInt(inputQuantity.value);
+    
+    item.quantity = updateQuantity;
+    savePanier(panier);
+    
+    //Condition si article <1 ou >100
+    if (item.quantity < 1) {
+      deleteItemAction(foundID, item);
+      window.location.reload();
+      alert(
+        "Vous ne pouvez pas prendre une quantité inférieur à 100, article supprimé "
+      );
+      savePanier(panier);
+    } else if (item.quantity > 100) {
+      alert("Vous ne pouvez pas prendre plus de 100 articles !");
+      window.location.reload();
+      item.quantity = 100;
+      savePanier(panier);
     }
 
-    // Prix et quantité total  (de base vaux 0)
-    let prixTotal = 0;
-    let quantiteTotal = 0;
+    calcul(data)
+      
+  });
+  
+}
 
-    // On affiche tous les éléments stockés dans le LS dans le panier
-    for (let i in panier) {
-      //On recherche la correspondance entre l'ID de  l'API et l'ID stocké dans le panier (LS)
-      const foundID = data.find((p) => p._id === panier[i].id);
+//Ajout du fonction supprimer
+function deleteItem(foundID, item, settingsDiv) {
+  const deleteDiv = document.createElement("div");
+  deleteDiv.classList.add("cart__item__content__settings__delete");
 
-      if (foundID != undefined) {
-        //ARTICLE
-        const article = document.createElement("article");
-        const classCart_item = article.classList.add("cart__item");
-        article.setAttribute("data-id", panier[i].id);
-        article.setAttribute("data-color", panier[i].color);
-        //DIV
-        const div1 =
-          document.createElement("div"); /*<div class="cart__item__img">*/
-        const div2 =
-          document.createElement("div"); /*<div class="cart__item__content">*/
-        const div3 =
-          document.createElement(
-            "div"
-          ); /*<div class="cart__item__content__description">*/
-        const div4 =
-          document.createElement(
-            "div"
-          ); /*<div class="cart__item__content__settings">*/
-        const div5 =
-          document.createElement(
-            "div"
-          ); /*<div class="cart__item__content__settings__quantity">*/
-        const div6 =
-          document.createElement(
-            "div"
-          ); /*<div class="cart__item__content__settings__delete">*/
-        //P,Hn
+  const pDelete = document.createElement("p");
+  pDelete.classList.add("deleteItem");
 
-        // On créer nos balises
-        const h2 = document.createElement("h2");
-        const pColor = document.createElement("p");
-        const pPrice = document.createElement("p");
-        const pQuantity = document.createElement("p");
-        const pDeleteItem = document.createElement("p");
-        const img = document.createElement("img");
+  pDelete.textContent = "Supprimer";
 
-        //Image
-        div1.classList.add("cart__item__img");
-        img.src = foundID.imageUrl;
-        img.alt = foundID.altTxt;
+  pDelete.addEventListener("click", () => {
+    deleteItemAction( item);
+    alert("Article supprimé");
+    savePanier(panier);
+    window.location.reload();
+  });
+  settingsDiv.append(deleteDiv);
+  deleteDiv.append(pDelete);
+}
 
-        //CART ITEM CONTENT
-        div2.classList.add("cart__item__content");
-        div3.classList.add("cart__item__content__description");
-        h2.textContent = data[i].description;
-        pColor.textContent = panier[i].color;
-        pPrice.textContent = `${foundID.price} €`;
+//Action supprimé
+function deleteItemAction( item) {
+  panier = panier.filter((p) => p.id != item.id || p.color != item.color);
+}
 
-        //CART ITEM SETTINGS
-        div4.classList.add("cart__item__content__settings");
+//Calcul de la quantité et prix !
+function calcul(data) {
 
-        //CART ITEM SETTINGS QUANTITY
-        div5.classList.add("cart__item__content__settings__quantity");
-        pQuantity.textContent = "Qté :";
+    let totalQuantity = 0;
+    let totalPrice = 0;
 
-        //CREATION DU INPUT
-        const input = document.createElement("input");
-        input.setAttribute("type", "number");
-        input.setAttribute("class", "itemQuantity");
-        input.setAttribute("name", "itemQuantity");
-        input.setAttribute("min", "1");
-        input.setAttribute("max", "100");
-        input.setAttribute("value", panier[i].quantity);
-
-        //CART ITEM SETTINGS DELETE
-        div6.classList.add("cart__item__content__settings__delete");
-        pDeleteItem.classList.add("deleteItem");
-        pDeleteItem.textContent = "Supprimer";
-
-        //Si foundPanier=== true alors on change la quantité de l'input dans le LS
-        const foundID2 = foundID;
-        input.addEventListener("change", () => {
-          const updateQuantity = parseInt(input.value);
-
-          panier[i].quantity = updateQuantity;
-          //Calculs des quantités dynamiquement
-          let quantiteTotalDynamique = 0;
-          let prixTotalDynamique = 0;
-
-          panier.forEach((e) => {
-            const foundID = data.find((p) => p._id === e.id);
-
-            quantiteTotalDynamique += e.quantity;
-            prixTotalDynamique += foundID.price * e.quantity;
-            console.log(foundID, e);
-          });
-
-          savePanier(panier);
-          if (quantiteTotalDynamique > 1) {
-            idPrice.innerHTML = `<p>Total (<span id="totalQuantity">${quantiteTotalDynamique}</span> articles) : <span id="$totalPrice">${prixTotalDynamique}</span> €</p`;
-          } else {
-            idPrice.innerHTML = `<p>Total (<span id="totalQuantity">${quantiteTotalDynamique}</span> article) : <span id="totalPrice">${prixTotalDynamique}</span> €</p`;
-          }
-
-          // Condition si panier inférieur à 0 ou supperieur à 100
-          if (panier[i].quantity > 100) {
-            alert("Vous ne pouvez pas prendre plus de 100 articles !");
-            panier[i].quantity = 100;
-            savePanier(panier);
-          }
-          //Si panier inférieur à 0 on supprime l'article du panier
-          if (panier[i].quantity <= 0) {
-            panier = panier.filter(
-              (p) => p.id != panier[i].id || p.color != panier[i].color
-            );
-            savePanier(panier);
-            window.location.reload();
-          }
-        });
-
-        // Suppression élément panier
-        function deletePanier() {
-          pDeleteItem.addEventListener("click", () => {
-            panier = panier.filter(
-              (p) => p.id != panier[i].id || p.color != panier[i].color
-            );
-            alert("Article supprimé");
-            savePanier(panier);
-            window.location.reload();
-          });
+    for(let i in panier){
+        const item = panier[i];
+        const foundID = data.find((p) => p._id === item.id);
+        if (foundID == undefined) {
+          continue;
         }
-        deletePanier();
-        quantiteTotal += panier[i].quantity;
-        // Prix Total
-        prixTotal += foundID.price * panier[i].quantity;
-
-        //On affiche par default les quantités et prix , si l'utilisateur change de quantité alors on se reférer au addEventListener('change')
-        if (quantiteTotal > 1) {
-          idPrice.innerHTML = `<p>Total (<span id="totalQuantity">${quantiteTotal}</span> articles) : <span id="$totalPrice">${prixTotal}</span> €</p`;
-        } else {
-          idPrice.innerHTML = `<p>Total (<span id="totalQuantity">${quantiteTotal}</span> article) : <span id="totalPrice">${prixTotal}</span> €</p`;
-        }
-
-        // On ajoute nos élements à leurs parents
-        idItems.append(article);
-        /////////////////////
-        article.append(div1);
-        div1.append(img);
-        /////////////////////
-        article.append(div2);
-        div2.append(div3);
-        /////////////////////
-        div3.append(h2);
-        div3.append(pColor);
-
-        /////////////////////
-        div2.append(div4);
-        div5.append(pQuantity);
-        div3.append(pPrice);
-        div4.append(div5);
-
-        div5.append(input);
-        ////////////////////
-        div4.append(div6);
-        div6.append(pDeleteItem);
-      }
+        totalQuantity += item.quantity;
+        totalPrice += foundID.price * item.quantity;
     }
+    quantityContainer.textContent = totalQuantity;
+    priceContainer.textContent = totalPrice;
+}
 
-    //*****************************************************formElementULAIRE************************************************************* */
+
+    //*****************************************************FORMULAIRE************************************************************* */
 
     //PRENOM
 
@@ -223,9 +236,8 @@ fetch(`http://localhost:3000/api/products`)
         validationEmail(formElement.email)
       ) {
         //Envoi formElementulaire
-        envoieformElementulaire();
+        envoieFormulaire();
       } else {
-        alert("Forumaire non valide !");
+        alert("Formulaire non valide !");
       }
     });
-  });
