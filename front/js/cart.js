@@ -1,6 +1,6 @@
 const itemContainer = document.querySelector("#cart__items");
 let panier = getPanier();
-
+const cartPrice = document.querySelector(".cart__price");
 const quantityContainer = document.querySelector("#totalQuantity");
 const priceContainer = document.querySelector("#totalPrice");
 //Appelle l'API
@@ -186,8 +186,12 @@ function calcul(data) {
     totalQuantity += item.quantity;
     totalPrice += foundID.price * item.quantity;
   }
-  quantityContainer.textContent = totalQuantity;
-  priceContainer.textContent = totalPrice;
+
+  if (totalQuantity === 1) {
+    cartPrice.innerHTML = `<p>Total (<span id="totalQuantity"></span> ${totalQuantity} article) : <span id="totalPrice">${totalPrice}</span> €</p>`;
+  } else {
+    cartPrice.innerHTML = `<p>Total (<span id="totalQuantity"></span> ${totalQuantity} articles) : <span id="totalPrice">${totalPrice}</span> €</p>`;
+  }
 }
 
 //*****************************************************FORMULAIRE************************************************************* */

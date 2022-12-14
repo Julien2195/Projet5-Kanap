@@ -1,5 +1,6 @@
 //Recherche de l'URL via window.location
 const getID = window.location.search;
+
 //On coupe le ? avec la methode slice pour recuperer seulement l'id
 let myID = getID.slice(1);
 
